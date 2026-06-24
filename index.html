@@ -6,6 +6,8 @@
     <title>Tsen'ny Tanora - Jobs Rapides</title>
     <!-- Tailwind CSS pour un design pro et ultra-léger -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chargement du client Supabase officiel -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* Optimisation pour le comportement "App Mobile" sur smartphone */
         body { -webkit-tap-highlight-color: transparent; }
@@ -44,8 +46,7 @@
 
         <!-- Le Flux des Missions -->
         <div id="flux-missions" class="space-y-4">
-            <!-- Les cartes de jobs vont s'insérer ici -->
-            <div class="text-center py-8 text-gray-500 text-sm">Chargement des opportunités...</div>
+            <div class="text-center py-8 text-gray-500 text-sm">Chargement des opportunités depuis le cloud...</div>
         </div>
 
     </main>
@@ -68,63 +69,58 @@
 
     <!-- Logique JavaScript -->
     <script>
-        // Simulation de données
-        const missionsExemples = [
-            {
-                id: "job_01",
-                titre: "Montage de 5 vidéos TikTok",
-                categorie: "Vidéo TikTok",
-                client: "Boutique de Vêtements (Tana)",
-                budget: 45000,
-                description: "Recherche un jeune monteur pour ajouter des sous-titres dynamiques et couper les blancs sur 5 vidéos de présentation de produits."
-            },
-            {
-                id: "job_02",
-                titre: "Création Logo & Couverture Facebook",
-                categorie: "Canva / Design",
-                client: "Fast Food FastMada",
-                budget: 30000,
-                description: "Besoin de visuels propres faits sur Canva pour lancer notre nouvelle page de livraison de burgers."
-            },
-            {
-                id: "job_03",
-                titre: "Cours de soutien en Statistiques",
-                categorie: "Cours / Aide",
-                client: "Particulier (Étudiant L1)",
-                budget: 15000,
-                description: "Besoin d'explications simples sur les probabilités et les variables aléatoires avant les examens."
-            }
-        ];
+        // Configuration de la connexion Supabase avec tes vraies clés
+        const SUPABASE_URL = "https://ovzrnzhhqrpomoxaflkv.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_w-weMY2zcEjZ4ouMq55ZGA_P2E_kUQA";
+        const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Fonction pour afficher les missions sur l'écran
-        function afficherMissions(liste) {
+        // Fonction pour aller chercher les missions en base de données
+        async function chargerMissionsDepuisSupabase() {
             const conteneur = document.getElementById('flux-missions');
-            if (!conteneur) return;
-            conteneur.innerHTML = ''; // On vide le message de chargement
+            
+            try {
+                const { data: missions, error } = await supabase
+                    .from('missions')
+                    .select('*')
+                    .order('created_at', { ascending: false });
 
-            liste.forEach(job => {
-                const carteHtml = `
-                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl hover:border-gray-700 transition duration-200">
-                        <div class="flex justify-between items-start gap-2 mb-2">
-                            <span class="bg-gray-800 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-wide">
-                                ${job.categorie}
-                            </span>
-                            <span class="text-sm font-mono font-bold text-emerald-400 whitespace-nowrap">
-                                ${job.budget.toLocaleString('fr-FR')} Ar
-                            </span>
+                if (error) throw error;
+
+                if (!missions || missions.length === 0) {
+                    conteneur.innerHTML = '<div class="text-center py-8 text-gray-500 text-sm">Aucune mission disponible pour le moment.</div>';
+                    return;
+                }
+
+                conteneur.innerHTML = ''; // On vide l'indicateur de chargement
+
+                missions.forEach(job => {
+                    const carteHtml = `
+                        <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl hover:border-gray-700 transition duration-200">
+                            <div class="flex justify-between items-start gap-2 mb-2">
+                                <span class="bg-gray-800 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-wide">
+                                    ${job.categorie}
+                                </span>
+                                <span class="text-sm font-mono font-bold text-emerald-400 whitespace-nowrap">
+                                    ${job.budget.toLocaleString('fr-FR')} Ar
+                                </span>
+                            </div>
+                            <h3 class="text-base font-bold text-gray-100 mb-1">${job.titre}</h3>
+                            <p class="text-xs text-gray-400 line-clamp-2 mb-3">${job.description}</p>
+                            <div class="flex justify-between items-center border-t border-gray-800/60 pt-3">
+                                <span class="text-[11px] text-gray-500">Par : ${job.client}</span>
+                                <button onclick="postuler('${job.id}', ${job.budget})" class="bg-gray-800 hover:bg-amber-500 text-gray-200 hover:text-gray-950 text-xs font-bold px-3 py-1.5 rounded-lg transition duration-150">
+                                    Postuler
+                                </button>
+                            </div>
                         </div>
-                        <h3 class="text-base font-bold text-gray-100 mb-1">${job.titre}</h3>
-                        <p class="text-xs text-gray-400 line-clamp-2 mb-3">${job.description}</p>
-                        <div class="flex justify-between items-center border-t border-gray-800/60 pt-3">
-                            <span class="text-[11px] text-gray-500">Par : ${job.client}</span>
-                            <button onclick="postuler('${job.id}', ${job.budget})" class="bg-gray-800 hover:bg-amber-500 text-gray-200 hover:text-gray-950 text-xs font-bold px-3 py-1.5 rounded-lg transition duration-150">
-                                Postuler
-                            </button>
-                        </div>
-                    </div>
-                `;
-                conteneur.insertAdjacentHTML('beforeend', carteHtml);
-            });
+                    `;
+                    conteneur.insertAdjacentHTML('beforeend', carteHtml);
+                });
+
+            } catch (error) {
+                console.error("Erreur lors de la récupération :", error);
+                conteneur.innerHTML = '<div class="text-center py-8 text-red-400 text-sm">Erreur de connexion à la base de données.</div>';
+            }
         }
 
         // Action quand on clique sur "Postuler"
@@ -132,22 +128,10 @@
             alert("Succès ! Votre candidature a été envoyée. Si le client accepte, " + budget.toLocaleString('fr-FR') + " Ar seront sécurisés sur l'application.");
         }
 
-        // Lancement au chargement de la page
+        // Lancement au chargement complet de la page
         window.onload = () => {
-            afficherMissions(missionsExemples);// Gestion du clic sur les boutons de catégories pour filtrer
-  
-           document.querySelectorAll('button').forEach(bouton => {
-        if (['Tout voir', 'Vidéo TikTok', 'Canva / Design', 'Cours / Aide'].includes(bouton.innerText.trim())) {
-            bouton.addEventListener('click', (e) => {
-                const catChoisie = e.target.innerText.trim();
-                const missionsFiltrees = catChoisie === 'Tout voir' 
-                    ? missionsExemples 
-                    : missionsExemples.filter(m => m.categorie === catChoisie);
-                afficherMissions(missionsFiltrees);
-            });
-        }
-    });
-};
+            chargerMissionsDepuisSupabase();
+        };
     </script>
 </body>
 </html>
