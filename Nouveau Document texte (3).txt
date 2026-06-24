@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tsen'ny Tanora - Jobs Rapides</title>
+    <!-- Tailwind CSS pour un design pro et ultra-léger -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Optimisation pour le comportement "App Mobile" sur smartphone */
+        body { -webkit-tap-highlight-color: transparent; }
+    </style>
+</head>
+<body class="bg-gray-950 text-gray-100 font-sans antialiased selection:bg-amber-500 selection:text-black">
+
+    <!-- En-tête de l'application -->
+    <header class="sticky top-0 bg-gray-900/90 backdrop-blur-md border-b border-gray-800 px-4 py-3 flex justify-between items-center z-50">
+        <div>
+            <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+                Tsen'ny Tanora
+            </h1>
+            <p class="text-xs text-gray-400">Asa hitadiavana vola</p>
+        </div>
+        <!-- Bouton Profil / Solde -->
+        <div class="bg-gray-800 border border-gray-700 px-3 py-1.5 rounded-full flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-mono font-bold text-emerald-400" id="user-balance">0 Ar</span>
+        </div>
+    </header>
+
+    <!-- Conteneur Principal -->
+    <main class="max-w-md mx-auto px-4 py-6 pb-24">
+        
+        <!-- Zone de Filtrage Rapide (Consomme peu de data, pas d'images lourdes) -->
+        <div class="mb-6">
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Catégories</h2>
+            <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                <button class="bg-amber-500 text-gray-950 text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap">Tout voir</button>
+                <button class="bg-gray-900 border border-gray-800 text-xs px-4 py-2 rounded-full whitespace-nowrap text-gray-300 hover:border-gray-700">Vidéo TikTok</button>
+                <button class="bg-gray-900 border border-gray-800 text-xs px-4 py-2 rounded-full whitespace-nowrap text-gray-300 hover:border-gray-700">Canva / Design</button>
+                <button class="bg-gray-900 border border-gray-800 text-xs px-4 py-2 rounded-full whitespace-nowrap text-gray-300 hover:border-gray-700">Cours / Aide</button>
+            </div>
+        </div>
+
+        <!-- Le Flux des Missions (Généré dynamiquement par JS) -->
+        <div id="flux-missions" class="space-y-4">
+            <!-- Les cartes de jobs vont s'insérer ici -->
+            <div class="text-center py-8 text-gray-500 text-sm">Chargement des opportunités...</div>
+        </div>
+
+    </main>
+
+    <!-- Barre de Navigation Basse (Style Application Mobile Native) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800 px-6 py-2 flex justify-around items-center max-w-md mx-auto z-50">
+        <button class="flex flex-col items-center gap-1 text-amber-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span class="text-[10px] font-medium">Missions</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <span class="text-[10px] font-medium">Publier</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-200">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span class="text-[10px] font-medium">Mon Compte</span>
+        </button>
+    </nav>
+
+    <!-- Logique JavaScript pour simuler le chargement des données réelles -->
+    <script>
+        // Simulation de données issues de votre base de données (Firebase/Supabase)
+        const missionsExemples = [
+            {
+                id: "job_01",
+                titre: "Montage de 5 vidéos TikTok",
+                categorie: "Vidéo TikTok",
+                client: "Boutique de Vêtements (Tana)",
+                budget: 45000,
+                description: "Recherche un jeune monteur pour ajouter des sous-titres dynamiques et couper les blancs sur 5 vidéos de présentation de produits."
+            },
+            {
+                id: "job_02",
+                titre: "Création Logo & Couverture Facebook",
+                categorie: "Canva / Design",
+                client: "Fast Food FastMada",
+                budget: 30000,
+                description: "Besoin de visuels propres faits sur Canva pour lancer notre nouvelle page de livraison de burgers."
+            },
+            {
+                id: "job_03",
+                titre: "Cours de soutien en Statistiques",
+                categorie: "Cours / Aide",
+                client: "Particulier (Étudiant L1)",
+                budget: 15000,
+                description: "Besoin d'explications simples sur les probabilités et les variables aléatoires avant les examens."
+            }
+        ];
+
+        // Fonction pour afficher les missions sur l'écran
+        function afficherMissions(liste) {
+            const conteneur = document.getElementById('flux-missions');
+            conteneur.innerHTML = ''; // On vide le message de chargement
+
+            liste.forEach(job => {
+                const carteHtml = `
+                    <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl hover:border-gray-700 transition duration-200">
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <span class="bg-gray-800 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded border border-amber-500/20 uppercase tracking-wide">
+                                ${job.categorie}
+                            </span>
+                            <span class="text-sm font-mono font-bold text-emerald-400 whitespace-nowrap">
+                                ${job.budget.toLocaleString('fr-FR')} Ar
+                            </span>
+                        </div>
+                        <h3 class="text-base font-bold text-gray-100 mb-1">${job.titre}</h3>
+                        <p class="text-xs text-gray-400 line-clamp-2 mb-3">${job.description}</p>
+                        <div class="flex justify-between items-center border-t border-gray-800/60 pt-3">
+                            <span class="text-[11px] text-gray-500">Par : ${job.client}</span>
+                            <button onclick="postuler('${job.id}', ${job.budget})" class="bg-gray-800 hover:bg-amber-500 text-gray-200 hover:text-gray-950 text-xs font-bold px-3 py-1.5 rounded-lg transition duration-150">
+                                Postuler
+                            </button>
+                        </div>
+                    </div>
+                `;
+                conteneur.insertAdjacentHTML('beforeend', carteHtml);
+            });
+        }
+
+        // Action quand le jeune clique sur "Postuler"
+        function postuler(idJob, budget) {
+            alert(Succès ! Votre candidature a été envoyée. Si le client accepte, ${budget.toLocaleString('fr-FR')} Ar seront sécurisés sur l'application.);
+        }
+
+        // Lancement au chargement de la page
+        window.onload = () => {
+            afficherMissions(missionsExemples);
+        };
+    </script>
+</body>
+</html>

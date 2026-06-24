@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tsen'ny Tanora - Administration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 font-sans p-4">
+
+    <main class="max-w-2xl mx-auto">
+        <!-- En-tête Admin -->
+        <div class="border-b border-gray-800 pb-4 mb-6">
+            <h1 class="text-xl font-black text-amber-500 uppercase tracking-wider">Panneau de Contrôle Financier</h1>
+            <p class="text-xs text-gray-400">Suivi des flux Mobile Money & Validation des dépôts</p>
+        </div>
+
+        <!-- Statistiques Globales (Vos Gains) -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl">
+                <span class="text-[10px] uppercase font-bold text-gray-500">Volume Total Escrow</span>
+                <p class="text-lg font-mono font-bold text-amber-400" id="total-escrow">0 Ar</p>
+            </div>
+            <div class="bg-gray-900 border border-gray-800 p-4 rounded-xl">
+                <span class="text-[10px] uppercase font-bold text-gray-500">Vos Commissions (10%)</span>
+                <p class="text-lg font-mono font-bold text-emerald-400" id="total-commissions">0 Ar</p>
+            </div>
+        </div>
+
+        <!-- Section Validation des Dépôts Manuels -->
+        <div class="bg-gray-900 border border-gray-800 rounded-xl p-4 mb-6">
+            <h2 class="text-sm font-bold uppercase text-gray-300 mb-4 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-orange-500"></span>
+                Demandes de Rechargement en attente
+            </h2>
+
+            <div class="space-y-3" id="liste-attente-depot">
+                <!-- Les demandes vont apparaître ici -->
+                <div class="text-center py-4 text-xs text-gray-500">Aucune demande en attente de validation SMS.</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Simulation des demandes reçues quand un client déclare avoir envoyé un Mobile Money
+        const demandesDepots = [
+            { id_demande: "dep_101", utilisateur: "Boutique Fashion-Mada", telephone: "0348765432", operateur: "Orange Money", montant: 50000, ref_sms: "TX-998231" },
+            { id_demande: "dep_102", utilisateur: "E-Kaly Express", telephone: "0381122334", operateur: "Mvola", montant: 30000, ref_sms: "MV-441290" }
+        ];
+
+        function afficherDemandesAdmin() {
+            const conteneur = document.getElementById('liste-attente-depot');
+            if(demandesDepots.length === 0) return;
+            
+            conteneur.innerHTML = '';
+            demandesDepots.forEach(depot => {
+                const itemHtml = `
+                    <div class="bg-gray-950 border border-gray-800 p-3 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-gray-200">${depot.utilisateur}</span>
+                                <span class="bg-gray-800 text-gray-400 text-[9px] px-1.5 py-0.5 rounded">${depot.operateur}</span>
+                            </div>
+                            <p class="text-[11px] text-gray-400 mt-0.5">Tél : ${depot.telephone} | Réf SMS : <span class="font-mono text-amber-500">${depot.ref_sms}</span></p>
+                        </div>
+                        <div class="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 border-gray-800/50 pt-2 sm:pt-0">
+                            <span class="text-xs font-mono font-bold text-emerald-400">${depot.montant.toLocaleString('fr-FR')} Ar</span>
+                            <button onclick="validerDepot('${depot.id_demande}', ${depot.montant})" class="bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold px-3 py-1.5 rounded transition">
+                                Valider le Solde
+                            </button>
+                        </div>
+                    </div>
+                `;
+                conteneur.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
+
+        function validerDepot(idDemande, montant) {
+            // Ici, le code enverra l'ordre à Supabase d'ajouter les Ariary sur le compte de l'utilisateur
+            alert(Paiement vérifié ! ${montant.toLocaleString('fr-FR')} Ar ont été crédités sur le portefeuille du client.);
+            // Suppression visuelle après validation
+            const index = demandesDepots.findIndex(d => d.id_demande === idDemande);
+            if(index > -1) {
+                demandesDepots.splice(index, 1);
+                afficherDemandesAdmin();
+                mettreAjourCompteurs(montant);
+            }
+        }
+
+        function mettreAjourCompteurs(montantAjoute) {
+            document.getElementById('total-escrow').innerText = montantAjoute.toLocaleString('fr-FR') + " Ar";
+            document.getElementById('total-commissions').innerText = (montantAjoute * 0.10).toLocaleString('fr-FR') + " Ar";
+        }
+
+        window.onload = () => {
+            afficherDemandesAdmin();
+        };
+    </script>
+</body>
+</html>
