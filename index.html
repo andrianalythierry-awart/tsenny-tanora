@@ -6,12 +6,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-gray-950 text-white p-4">
-    <h1 class="text-xl font-bold mb-4">Tsen'ny Tanora</h1>
-    <div id="flux-missions">Chargement...</div>
+<body class="bg-gray-950 text-white p-6">
+    <h1 class="text-3xl font-bold mb-8 text-amber-500">Tsen'ny Tanora</h1>
+    <div id="flux-missions" class="grid gap-6">Chargement...</div>
 
     <script>
-        // Utilisation directe de supabase, sans 'window.'
         const supabaseClient = supabase.createClient(
             "https://ovzrnzhhqrpomoxaflkv.supabase.co",
             "sb_publishable_w-weMY2zcEjZ4ouMq55ZGA_P2E_kUQA"
@@ -22,10 +21,16 @@
             try {
                 const { data, error } = await supabaseClient.from('missions').select('*');
                 if (error) throw error;
+                
                 container.innerHTML = data.map(m => `
-                    <div class="bg-gray-900 p-4 mb-2 rounded border border-gray-700">
-                        <p class="font-bold">${m.titre}</p>
-                        <p class="text-sm text-gray-400">${m.budget} Ar</p>
+                    <div class="bg-gray-900 border border-gray-700 p-6 rounded-xl hover:border-amber-500 transition">
+                        <h3 class="font-bold text-xl text-amber-100">${m.titre}</h3>
+                        <p class="text-gray-400 mt-2 italic">${m.description || 'Service disponible'}</p>
+                        <p class="text-amber-500 font-bold mt-4 mb-4">${m.budget} Ar</p>
+                        <a href="https://wa.me/2613XXXXXXXXX?text=Bonjour, je souhaite réserver la mission : ${encodeURIComponent(m.titre)}" 
+                           class="block text-center bg-amber-500 text-gray-900 font-bold py-2 rounded-lg hover:bg-amber-400">
+                           Réserver via WhatsApp
+                        </a>
                     </div>
                 `).join('');
             } catch (e) {
