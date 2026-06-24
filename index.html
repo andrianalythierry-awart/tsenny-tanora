@@ -4,43 +4,36 @@
     <meta charset="UTF-8">
     <title>Tsen'ny Tanora</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- On charge le client Supabase -->
+    <!-- Chargement direct de la bibliothèque -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-950 text-white p-4">
     <h1 class="text-xl font-bold mb-4">Tsen'ny Tanora</h1>
-    <div id="flux-missions" class="space-y-4">
-        <p>Connexion en cours...</p>
-    </div>
+    <div id="flux-missions">Chargement...</div>
 
     <script>
-        // On utilise un bloc unique pour éviter les doublons
-        (function() {
-            const { createClient } = supabase;
-            const _supabase = createClient(
-                "https://ovzrnzhhqrpomoxaflkv.supabase.co",
-                "sb_publishable_w-weMY2zcEjZ4ouMq55ZGA_P2E_kUQA"
-            );
+        // On attend que la librairie soit bien chargée
+        window.addEventListener('load', async () => {
+            try {
+                const supabase = window.supabase.createClient(
+                    "https://ovzrnzhhqrpomoxaflkv.supabase.co",
+                    "sb_publishable_w-weMY2zcEjZ4ouMq55ZGA_P2E_kUQA"
+                );
 
-            async function chargerMissions() {
-                const conteneur = document.getElementById('flux-missions');
-                const { data, error } = await _supabase.from('missions').select('*');
+                const { data, error } = await supabase.from('missions').select('*');
                 
-                if (error) {
-                    conteneur.innerHTML = <p class="text-red-500">Erreur : ${error.message}</p>;
-                    return;
-                }
+                if (error) throw error;
 
-                conteneur.innerHTML = data.map(job => `
-                    <div class="bg-gray-900 p-4 rounded border border-gray-700">
-                        <h3 class="font-bold">${job.titre}</h3>
-                        <p class="text-xs text-gray-400">${job.budget} Ar</p>
+                document.getElementById('flux-missions').innerHTML = data.map(job => `
+                    <div class="bg-gray-900 p-4 mb-2 rounded border border-gray-700">
+                        <p class="font-bold">${job.titre}</p>
+                        <p class="text-sm text-gray-400">${job.budget} Ar</p>
                     </div>
                 `).join('');
+            } catch (err) {
+                document.getElementById('flux-missions').innerHTML = "Erreur : " + err.message;
             }
-
-            chargerMissions();
-        })();
+        });
     </script>
 </body>
 </html>
