@@ -134,8 +134,25 @@
 
         // Lancement au chargement de la page
         window.onload = () => {
-            afficherMissions(missionsExemples);
-        };
+            afficherMissions(missionsExemples);// Gestion du clic sur les boutons de catégories pour filtrer
+  
+            document.querySelectorAll('button').forEach(bouton => {
+    // On repère les boutons de catégories en haut
+    if (['Tout voir', 'Vidéo TikTok', 'Canva / Design', 'Cours / Aide'].includes(bouton.innerText.trim())) {
+      bouton.addEventListener('click', (e) => {
+        const catChoisie = e.target.innerText.trim();
+        
+        // On filtre la liste des missions
+        const missionsFiltrees = catChoisie === 'Tout voir' 
+          ? missionsExemples 
+          : missionsExemples.filter(m => m.categorie === catChoisie);
+        
+        // On ré-affiche uniquement les missions filtrées
+        afficherMissions(missionsFiltrees);
+      });
+    }
+   });
+  };     
     </script>
 </body>
 </html>
