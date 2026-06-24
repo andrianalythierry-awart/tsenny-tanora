@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Tsen'ny Tanora</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chargement direct de la bibliothèque -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-gray-950 text-white p-4">
@@ -12,28 +11,29 @@
     <div id="flux-missions">Chargement...</div>
 
     <script>
-        // On attend que la librairie soit bien chargée
-        window.addEventListener('load', async () => {
+        // Utilisation directe de supabase, sans 'window.'
+        const supabaseClient = supabase.createClient(
+            "https://ovzrnzhhqrpomoxaflkv.supabase.co",
+            "sb_publishable_w-weMY2zcEjZ4ouMq55ZGA_P2E_kUQA"
+        );
+
+        async function init() {
+            const container = document.getElementById('flux-missions');
             try {
-                const supabase = window.supabase.createClient(
-                    "https://ovzrnzhhqrpomoxaflkv.supabase.co",
-                    "sb_publishable_w-weMY2zcEjZ4ouMq55ZGA_P2E_kUQA"
-                );
-
-                const { data, error } = await supabase.from('missions').select('*');
-                
+                const { data, error } = await supabaseClient.from('missions').select('*');
                 if (error) throw error;
-
-                document.getElementById('flux-missions').innerHTML = data.map(job => `
+                container.innerHTML = data.map(m => `
                     <div class="bg-gray-900 p-4 mb-2 rounded border border-gray-700">
-                        <p class="font-bold">${job.titre}</p>
-                        <p class="text-sm text-gray-400">${job.budget} Ar</p>
+                        <p class="font-bold">${m.titre}</p>
+                        <p class="text-sm text-gray-400">${m.budget} Ar</p>
                     </div>
                 `).join('');
-            } catch (err) {
-                document.getElementById('flux-missions').innerHTML = "Erreur : " + err.message;
+            } catch (e) {
+                container.innerHTML = "Erreur de chargement.";
+                console.error(e);
             }
-        });
+        }
+        init();
     </script>
 </body>
 </html>
